@@ -1,0 +1,26 @@
+<x-app-layout>
+    <x-slot name="header"><x-partials.page-header title="Add Stock Issue" description="Issue stock based on available balance." /></x-slot>
+    <div class="card">
+        <form method="POST" action="{{ route('stock-issues.store') }}">
+            @csrf
+            <div class="grid gap-6 md:grid-cols-2">
+                <div><x-input-label for="issue_no" value="Issue No" /><input id="issue_no" name="issue_no" type="text" class="input" value="{{ old('issue_no') }}"><x-input-error :messages="$errors->get('issue_no')" class="mt-2" /></div>
+                <div><x-input-label for="issue_date" value="Issue Date" /><input id="issue_date" name="issue_date" type="date" class="input" value="{{ old('issue_date', now()->format('Y-m-d')) }}" required><x-input-error :messages="$errors->get('issue_date')" class="mt-2" /></div>
+                <div><x-input-label for="store_id" value="Store" /><select id="store_id" name="store_id" class="select" required><option value="">Select</option>@foreach($stores as $store)<option value="{{ $store->id }}" @selected(old('store_id') == $store->id)>{{ $store->name }}</option>@endforeach</select><x-input-error :messages="$errors->get('store_id')" class="mt-2" /></div>
+                <div><x-input-label for="category_id" value="Category" /><select id="category_id" name="category_id" class="select" required><option value="">Select</option>@foreach($categories as $category)<option value="{{ $category->id }}" @selected(old('category_id') == $category->id)>{{ $category->name }}</option>@endforeach</select><x-input-error :messages="$errors->get('category_id')" class="mt-2" /></div>
+                <div><x-input-label for="item_id" value="Item" /><select id="item_id" name="item_id" class="select" required><option value="">Select</option>@foreach($items as $item)<option value="{{ $item->id }}" @selected(old('item_id') == $item->id)>{{ $item->name }} ({{ $item->item_code }})</option>@endforeach</select><x-input-error :messages="$errors->get('item_id')" class="mt-2" /></div>
+                <div><x-input-label for="purchase_requisition_id" value="Purchase Requisition" /><select id="purchase_requisition_id" name="purchase_requisition_id" class="select"><option value="">Optional</option>@foreach($purchaseRequisitions as $pr)<option value="{{ $pr->id }}" @selected(old('purchase_requisition_id') == $pr->id)>{{ $pr->pr_no }}</option>@endforeach</select><x-input-error :messages="$errors->get('purchase_requisition_id')" class="mt-2" /></div>
+                <div><x-input-label for="purchase_order_id" value="Purchase Order" /><select id="purchase_order_id" name="purchase_order_id" class="select"><option value="">Optional</option>@foreach($purchaseOrders as $po)<option value="{{ $po->id }}" @selected(old('purchase_order_id') == $po->id)>{{ $po->po_no }}</option>@endforeach</select><x-input-error :messages="$errors->get('purchase_order_id')" class="mt-2" /></div>
+                <div><x-input-label for="available_qty" value="Available Qty (auto-validated)" /><input id="available_qty" name="available_qty" type="number" step="0.01" class="input" value="{{ old('available_qty', 0) }}"><x-input-error :messages="$errors->get('available_qty')" class="mt-2" /></div>
+                <div><x-input-label for="issue_qty" value="Issue Qty" /><input id="issue_qty" name="issue_qty" type="number" step="0.01" class="input" value="{{ old('issue_qty') }}" required><x-input-error :messages="$errors->get('issue_qty')" class="mt-2" /></div>
+                <div><x-input-label for="issued_to_person" value="Issued To Person" /><input id="issued_to_person" name="issued_to_person" type="text" class="input" value="{{ old('issued_to_person') }}" required><x-input-error :messages="$errors->get('issued_to_person')" class="mt-2" /></div>
+                <div><x-input-label for="department_location" value="Department / Location" /><input id="department_location" name="department_location" type="text" class="input" value="{{ old('department_location') }}"><x-input-error :messages="$errors->get('department_location')" class="mt-2" /></div>
+                <div><x-input-label for="used_at" value="Used At" /><input id="used_at" name="used_at" type="text" class="input" value="{{ old('used_at') }}"><x-input-error :messages="$errors->get('used_at')" class="mt-2" /></div>
+                <div><x-input-label for="usage_purpose" value="Usage Purpose" /><input id="usage_purpose" name="usage_purpose" type="text" class="input" value="{{ old('usage_purpose') }}" required><x-input-error :messages="$errors->get('usage_purpose')" class="mt-2" /></div>
+                <div><x-input-label for="handover_name" value="Handover Name" /><input id="handover_name" name="handover_name" type="text" class="input" value="{{ old('handover_name') }}"><x-input-error :messages="$errors->get('handover_name')" class="mt-2" /></div>
+                <div class="md:col-span-2"><x-input-label for="remarks" value="Remarks" /><textarea id="remarks" name="remarks" class="textarea" rows="4">{{ old('remarks') }}</textarea><x-input-error :messages="$errors->get('remarks')" class="mt-2" /></div>
+            </div>
+            <div class="mt-6 flex gap-3"><button class="btn-primary">Save</button><a href="{{ route('stock-issues.index') }}" class="btn-secondary">Cancel</a></div>
+        </form>
+    </div>
+</x-app-layout>

@@ -1,0 +1,1 @@
+<x-app-layout><x-slot name="header"><x-partials.page-header title="Add Store" description="Create a new store master." /></x-slot><div class="card"><form method="POST" action="{{ route('stores.store') }}">@csrf @include('stores._form')</form></div></x-app-layout>

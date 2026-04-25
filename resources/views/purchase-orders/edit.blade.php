@@ -1,0 +1,1 @@
+<x-app-layout><x-slot name="header"><x-partials.page-header title="Edit Purchase Order" description="Update PO details." /></x-slot><div class="card"><form method="POST" action="{{ route('purchase-orders.update', $purchaseOrder) }}">@csrf @method('PUT') @include('purchase-orders._form')</form></div></x-app-layout>

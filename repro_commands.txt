@@ -1,0 +1,4 @@
+php artisan migrate:fresh --seed
+php artisan route:list
+php artisan test
+npm run build

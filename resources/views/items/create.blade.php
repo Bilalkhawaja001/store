@@ -1,0 +1,1 @@
+<x-app-layout><x-slot name="header"><x-partials.page-header title="Add Item" description="Create a material item." /></x-slot><div class="card"><form method="POST" action="{{ route('items.store') }}">@csrf @include('items._form')</form></div></x-app-layout>

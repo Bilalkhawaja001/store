@@ -1,0 +1,1 @@
+<x-app-layout><x-slot name="header"><x-partials.page-header title="Add Purchase Order" description="Create PO against selected requisition." /></x-slot><div class="card"><form method="POST" action="{{ route('purchase-orders.store') }}">@csrf @include('purchase-orders._form')</form></div></x-app-layout>

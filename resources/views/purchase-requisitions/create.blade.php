@@ -1,0 +1,1 @@
+<x-app-layout><x-slot name="header"><x-partials.page-header title="Add Purchase Requisition" description="Create material demand entry." /></x-slot><div class="card"><form method="POST" action="{{ route('purchase-requisitions.store') }}">@csrf @include('purchase-requisitions._form')</form></div></x-app-layout>
