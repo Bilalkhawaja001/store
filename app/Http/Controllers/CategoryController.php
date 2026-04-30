@@ -17,7 +17,10 @@ class CategoryController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('categories.index', compact('categories'));
+        return view('categories.index', [
+            'categories' => $categories,
+            'activeTab' => request('tab', 'list'),
+        ]);
     }
 
     public function create(): View

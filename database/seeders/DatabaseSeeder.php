@@ -68,6 +68,18 @@ class DatabaseSeeder extends Seeder
             ]
         );
 
+        $transitStore = Store::updateOrCreate(
+            ['store_code' => 'STR-0002'],
+            [
+                'name' => 'Transit Store',
+                'location' => 'Warehouse B',
+                'incharge_name' => 'Transit Custodian',
+                'contact_no' => '03007654321',
+                'remarks' => 'Used for transfer and loan tracking',
+                'is_active' => true,
+            ]
+        );
+
         $pr = PurchaseRequisition::updateOrCreate(
             ['pr_no' => 'PR-20260425-0001'],
             [
@@ -110,6 +122,12 @@ class DatabaseSeeder extends Seeder
                 'already_received_qty' => 0,
                 'received_qty' => 120,
                 'pending_qty' => 80,
+                'acquisition_type' => 'Loan',
+                'acquisition_reference' => 'LN-2026-001',
+                'lender_name' => 'Maintenance Loan Pool',
+                'loan_due_date' => now()->addDays(14)->toDateString(),
+                'loan_status' => 'On Loan',
+                'source_store_id' => $transitStore->id,
                 'challan_no' => 'CH-1001',
                 'received_by' => 'Store Supervisor',
                 'handover_to' => 'Electrical Team',

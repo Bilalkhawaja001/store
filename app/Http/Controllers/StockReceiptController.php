@@ -9,26 +9,53 @@ use App\Models\StockReceipt;
 use App\Models\Store;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
+use Illuminate\Support\Facades\DB;
 
 class StockReceiptController extends Controller
 {
     public function index(): View
     {
         $stockReceipts = StockReceipt::query()
-            ->with(['purchaseOrder', 'purchaseRequisition', 'item', 'store'])
+            ->with(['purchaseOrder', 'purchaseRequisition', 'item', 'store', 'sourceStore'])
             ->when(request('search'), function ($query, $search) {
                 $query->where(function ($innerQuery) use ($search) {
                     $innerQuery->where('grn_no', 'like', "%{$search}%")
                         ->orWhere('challan_no', 'like', "%{$search}%")
                         ->orWhere('received_by', 'like', "%{$search}%")
-                        ->orWhere('handover_to', 'like', "%{$search}%");
+                        ->orWhere('handover_to', 'like', "%{$search}%")
+                        ->orWhere('acquisition_type', 'like', "%{$search}%")
+                        ->orWhere('acquisition_reference', 'like', "%{$search}%")
+                        ->orWhere('lender_name', 'like', "%{$search}%")
+                        ->orWhere('loan_status', 'like', "%{$search}%");
                 });
             })
             ->latest('receive_date')
             ->paginate(10)
             ->withQueryString();
 
-        return view('stock-receipts.index', compact('stockReceipts'));
+        $purchaseOrders = PurchaseOrder::query()->with(['purchaseRequisition', 'item'])->orderByDesc('po_date')->get();
+
+        $acquisitionSummary = StockReceipt::query()
+            ->select([
+                DB::raw("COALESCE(acquisition_type, 'Unspecified') as acquisition_type"),
+                DB::raw('COUNT(*) as receipt_count'),
+                DB::raw('SUM(received_qty) as total_received_qty'),
+                DB::raw('SUM(CASE WHEN lender_name IS NOT NULL THEN 1 ELSE 0 END) as loan_receipt_count'),
+                DB::raw('MAX(receive_date) as latest_receive_date'),
+            ])
+            ->groupBy('acquisition_type')
+            ->orderBy('acquisition_type')
+            ->get();
+
+        return view('stock-receipts.index', [
+            'stockReceipts' => $stockReceipts,
+            'purchaseOrders' => $purchaseOrders,
+            'purchaseRequisitions' => PurchaseRequisition::query()->orderByDesc('pr_date')->get(),
+            'stores' => Store::query()->orderBy('name')->get(),
+            'acquisitionTypes' => StockReceipt::ACQUISITION_TYPES,
+            'loanStatuses' => StockReceipt::LOAN_STATUSES,
+            'acquisitionSummary' => $acquisitionSummary,
+        ]);
     }
 
     public function create(): View
@@ -39,6 +66,8 @@ class StockReceiptController extends Controller
             'purchaseOrders' => $purchaseOrders,
             'purchaseRequisitions' => PurchaseRequisition::query()->orderByDesc('pr_date')->get(),
             'stores' => Store::query()->orderBy('name')->get(),
+            'acquisitionTypes' => StockReceipt::ACQUISITION_TYPES,
+            'loanStatuses' => StockReceipt::LOAN_STATUSES,
         ]);
     }
 
@@ -60,7 +89,7 @@ class StockReceiptController extends Controller
 
     public function show(StockReceipt $stockReceipt): View
     {
-        $stockReceipt->load(['purchaseOrder', 'purchaseRequisition', 'item', 'store']);
+        $stockReceipt->load(['purchaseOrder', 'purchaseRequisition', 'item', 'store', 'sourceStore']);
 
         return view('stock-receipts.show', compact('stockReceipt'));
     }

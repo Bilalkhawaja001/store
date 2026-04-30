@@ -25,7 +25,11 @@ class ItemController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('items.index', compact('items'));
+        return view('items.index', [
+            'items' => $items,
+            'categories' => Category::query()->orderBy('name')->get(),
+            'activeTab' => request('tab', 'list'),
+        ]);
     }
 
     public function create(): View

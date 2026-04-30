@@ -23,7 +23,10 @@ class StoreController extends Controller
             ->paginate(10)
             ->withQueryString();
 
-        return view('stores.index', compact('stores'));
+        return view('stores.index', [
+            'stores' => $stores,
+            'activeTab' => request('tab', 'list'),
+        ]);
     }
 
     public function create(): View

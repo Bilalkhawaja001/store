@@ -45,7 +45,7 @@ class ReportController extends Controller
             ->get();
 
         $stockReceipts = StockReceipt::query()
-            ->with(['purchaseOrder', 'purchaseRequisition', 'item', 'store'])
+            ->with(['purchaseOrder', 'purchaseRequisition', 'item', 'store', 'sourceStore'])
             ->when(request('date_from'), fn ($query, $value) => $query->whereDate('receive_date', '>=', $value))
             ->when(request('date_to'), fn ($query, $value) => $query->whereDate('receive_date', '<=', $value))
             ->when(request('item_id'), fn ($query, $value) => $query->where('item_id', $value))
@@ -150,6 +150,22 @@ class ReportController extends Controller
             ->orderBy('categories.name')
             ->get();
 
+        $acquisitionSummary = StockReceipt::query()
+            ->select([
+                DB::raw("COALESCE(acquisition_type, 'Unspecified') as acquisition_type"),
+                DB::raw('COUNT(*) as receipt_count'),
+                DB::raw('SUM(received_qty) as total_received_qty'),
+                DB::raw('SUM(CASE WHEN lender_name IS NOT NULL THEN 1 ELSE 0 END) as loan_receipt_count'),
+                DB::raw('SUM(CASE WHEN source_store_id IS NOT NULL THEN 1 ELSE 0 END) as transfer_receipt_count'),
+            ])
+            ->when(request('date_from'), fn ($query, $value) => $query->whereDate('receive_date', '>=', $value))
+            ->when(request('date_to'), fn ($query, $value) => $query->whereDate('receive_date', '<=', $value))
+            ->when(request('item_id'), fn ($query, $value) => $query->where('item_id', $value))
+            ->when(request('store_id'), fn ($query, $value) => $query->where('store_id', $value))
+            ->groupBy('acquisition_type')
+            ->orderBy('acquisition_type')
+            ->get();
+
         return view('reports.index', compact(
             'filters',
             'categories',
@@ -163,7 +179,8 @@ class ReportController extends Controller
             'itemLedger',
             'personWise',
             'purposeWise',
-            'categoryWise'
+            'categoryWise',
+            'acquisitionSummary'
         ));
     }
 }

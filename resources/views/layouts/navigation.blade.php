@@ -21,7 +21,6 @@
                     ['label' => 'Purchase Orders', 'route' => 'purchase-orders.index'],
                     ['label' => 'Stock Receiving', 'route' => 'stock-receipts.index'],
                     ['label' => 'Stock Issue / Usage', 'route' => 'stock-issues.index'],
-                    ['label' => 'Stock Balance', 'route' => 'stock-balance.index'],
                     ['label' => 'Reports', 'route' => 'reports.index'],
                 ];
             @endphp

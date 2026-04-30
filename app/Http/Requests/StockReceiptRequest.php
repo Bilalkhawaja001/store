@@ -3,7 +3,9 @@
 namespace App\Http\Requests;
 
 use App\Models\PurchaseOrder;
+use App\Models\StockReceipt;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\Validator;
 
 class StockReceiptRequest extends FormRequest
@@ -23,6 +25,12 @@ class StockReceiptRequest extends FormRequest
             'item_id' => ['required', 'exists:items,id'],
             'store_id' => ['required', 'exists:stores,id'],
             'received_qty' => ['required', 'numeric', 'gt:0'],
+            'acquisition_type' => ['nullable', 'string', Rule::in(StockReceipt::ACQUISITION_TYPES)],
+            'acquisition_reference' => ['nullable', 'string', 'max:255'],
+            'lender_name' => ['nullable', 'string', 'max:255'],
+            'loan_due_date' => ['nullable', 'date'],
+            'loan_status' => ['nullable', 'string', Rule::in(StockReceipt::LOAN_STATUSES)],
+            'source_store_id' => ['nullable', 'different:store_id', 'exists:stores,id'],
             'challan_no' => ['nullable', 'string', 'max:255'],
             'received_by' => ['required', 'string', 'max:255'],
             'handover_to' => ['nullable', 'string', 'max:255'],
@@ -49,6 +57,20 @@ class StockReceiptRequest extends FormRequest
 
             if ((float) $this->input('received_qty') > $purchaseOrder->pendingQty()) {
                 $validator->errors()->add('received_qty', 'Receiving quantity cannot exceed pending PO quantity.');
+            }
+
+            if ($this->input('acquisition_type') === 'Loan') {
+                if (blank($this->input('lender_name'))) {
+                    $validator->errors()->add('lender_name', 'Lender name is required for loan receipts.');
+                }
+
+                if (blank($this->input('loan_due_date'))) {
+                    $validator->errors()->add('loan_due_date', 'Loan due date is required for loan receipts.');
+                }
+
+                if (blank($this->input('loan_status'))) {
+                    $validator->errors()->add('loan_status', 'Loan status is required for loan receipts.');
+                }
             }
         }];
     }

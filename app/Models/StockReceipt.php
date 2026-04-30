@@ -10,6 +10,22 @@ class StockReceipt extends Model
 {
     use HasFactory;
 
+    public const ACQUISITION_TYPES = [
+        'Purchase',
+        'Transfer In',
+        'Loan',
+        'Donation',
+        'Return',
+        'Adjustment',
+        'Other',
+    ];
+
+    public const LOAN_STATUSES = [
+        'On Loan',
+        'Returned',
+        'Overdue',
+    ];
+
     protected $fillable = [
         'grn_no',
         'receive_date',
@@ -21,6 +37,12 @@ class StockReceipt extends Model
         'already_received_qty',
         'received_qty',
         'pending_qty',
+        'acquisition_type',
+        'acquisition_reference',
+        'lender_name',
+        'loan_due_date',
+        'loan_status',
+        'source_store_id',
         'challan_no',
         'received_by',
         'handover_to',
@@ -35,6 +57,7 @@ class StockReceipt extends Model
             'already_received_qty' => 'decimal:2',
             'received_qty' => 'decimal:2',
             'pending_qty' => 'decimal:2',
+            'loan_due_date' => 'date',
         ];
     }
 
@@ -80,5 +103,10 @@ class StockReceipt extends Model
     public function store(): BelongsTo
     {
         return $this->belongsTo(Store::class);
+    }
+
+    public function sourceStore(): BelongsTo
+    {
+        return $this->belongsTo(Store::class, 'source_store_id');
     }
 }
