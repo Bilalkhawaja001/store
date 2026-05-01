@@ -12,7 +12,7 @@ use App\Http\Controllers\StockReceiptController;
 use App\Http\Controllers\StoreController;
 use Illuminate\Support\Facades\Route;
 
-Route::redirect('/', '/login');
+Route::get('/', fn () => redirect()->route('login'));
 
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard', DashboardController::class)->name('dashboard');
